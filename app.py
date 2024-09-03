@@ -10,15 +10,19 @@ st.markdown("""
     .stButton > button {
         width: 100%;
     }
+    .selected {
+        background-color: #ff4b4b !important;
+        color: white !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-def toggle_item(item, item_list):
-    if item in item_list:
-        item_list.remove(item)
+def toggle_selection(item, selected_list):
+    if item in selected_list:
+        selected_list.remove(item)
     else:
-        item_list.append(item)
-    return item_list
+        selected_list.append(item)
+    return selected_list
 
 def main():
     st.title("Interactive ML Project Generator")
@@ -36,13 +40,16 @@ def main():
     st.subheader("Select Libraries")
     cols_lib = st.columns(3)
     for i, lib in enumerate(libraries):
-        if cols_lib[i % 3].button(
-            lib, 
-            key=f"lib_{lib}",
-            type="primary" if lib in st.session_state.selected_libraries else "secondary"
-        ):
-            st.session_state.selected_libraries = toggle_item(lib, st.session_state.selected_libraries)
-            st.experimental_rerun()
+        button_key = f"lib_{lib}"
+        button_class = "selected" if lib in st.session_state.selected_libraries else ""
+        if cols_lib[i % 3].button(lib, key=button_key, on_click=toggle_selection, args=(lib, st.session_state.selected_libraries)):
+            pass
+        cols_lib[i % 3].markdown(f"""
+        <script>
+            var button = document.querySelector('button[kind="secondary"][data-testid="{button_key}"]');
+            button.classList.{'add' if button_class else 'remove'}('selected');
+        </script>
+        """, unsafe_allow_html=True)
 
     st.write("Selected libraries:", ", ".join(st.session_state.selected_libraries))
 
@@ -50,13 +57,16 @@ def main():
     st.subheader("Select ML Algorithms")
     cols_algo = st.columns(3)
     for i, algo in enumerate(ml_algorithms):
-        if cols_algo[i % 3].button(
-            algo, 
-            key=f"algo_{algo}",
-            type="primary" if algo in st.session_state.selected_algorithms else "secondary"
-        ):
-            st.session_state.selected_algorithms = toggle_item(algo, st.session_state.selected_algorithms)
-            st.experimental_rerun()
+        button_key = f"algo_{algo}"
+        button_class = "selected" if algo in st.session_state.selected_algorithms else ""
+        if cols_algo[i % 3].button(algo, key=button_key, on_click=toggle_selection, args=(algo, st.session_state.selected_algorithms)):
+            pass
+        cols_algo[i % 3].markdown(f"""
+        <script>
+            var button = document.querySelector('button[kind="secondary"][data-testid="{button_key}"]');
+            button.classList.{'add' if button_class else 'remove'}('selected');
+        </script>
+        """, unsafe_allow_html=True)
 
     # Display selected topics
     st.write("Selected ML Algorithms:", ", ".join(st.session_state.selected_algorithms))
