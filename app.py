@@ -17,12 +17,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def toggle_selection(item, selected_list):
-    if item in selected_list:
-        selected_list.remove(item)
-    else:
-        selected_list.append(item)
-    return selected_list
+def toggle_button(key):
+    if key not in st.session_state:
+        st.session_state[key] = False
+    st.session_state[key] = not st.session_state[key]
 
 def main():
     st.title("Interactive ML Project Generator")
@@ -30,46 +28,48 @@ def main():
     st.header("Generate Your Customized ML Project")
     st.write("Select libraries and ML algorithms you want to practice, then enter a project theme to get started!")
 
-    # Initialize session state for selections
-    if 'selected_libraries' not in st.session_state:
-        st.session_state.selected_libraries = []
-    if 'selected_algorithms' not in st.session_state:
-        st.session_state.selected_algorithms = []
-
     # Library selection
     st.subheader("Select Libraries")
     cols_lib = st.columns(3)
+    selected_libraries = []
     for i, lib in enumerate(libraries):
         button_key = f"lib_{lib}"
-        button_class = "selected" if lib in st.session_state.selected_libraries else ""
-        if cols_lib[i % 3].button(lib, key=button_key, on_click=toggle_selection, args=(lib, st.session_state.selected_libraries)):
+        if button_key not in st.session_state:
+            st.session_state[button_key] = False
+        if cols_lib[i % 3].button(
+            lib, 
+            key=button_key, 
+            on_click=toggle_button, 
+            args=(button_key,),
+            type="secondary" if not st.session_state[button_key] else "primary"
+        ):
             pass
-        cols_lib[i % 3].markdown(f"""
-        <script>
-            var button = document.querySelector('button[kind="secondary"][data-testid="{button_key}"]');
-            button.classList.{'add' if button_class else 'remove'}('selected');
-        </script>
-        """, unsafe_allow_html=True)
+        if st.session_state[button_key]:
+            selected_libraries.append(lib)
 
-    st.write("Selected libraries:", ", ".join(st.session_state.selected_libraries))
+    st.write("Selected libraries:", ", ".join(selected_libraries))
 
     # ML Algorithm selection
     st.subheader("Select ML Algorithms")
     cols_algo = st.columns(3)
+    selected_algorithms = []
     for i, algo in enumerate(ml_algorithms):
         button_key = f"algo_{algo}"
-        button_class = "selected" if algo in st.session_state.selected_algorithms else ""
-        if cols_algo[i % 3].button(algo, key=button_key, on_click=toggle_selection, args=(algo, st.session_state.selected_algorithms)):
+        if button_key not in st.session_state:
+            st.session_state[button_key] = False
+        if cols_algo[i % 3].button(
+            algo, 
+            key=button_key, 
+            on_click=toggle_button, 
+            args=(button_key,),
+            type="secondary" if not st.session_state[button_key] else "primary"
+        ):
             pass
-        cols_algo[i % 3].markdown(f"""
-        <script>
-            var button = document.querySelector('button[kind="secondary"][data-testid="{button_key}"]');
-            button.classList.{'add' if button_class else 'remove'}('selected');
-        </script>
-        """, unsafe_allow_html=True)
+        if st.session_state[button_key]:
+            selected_algorithms.append(algo)
 
     # Display selected topics
-    st.write("Selected ML Algorithms:", ", ".join(st.session_state.selected_algorithms))
+    st.write("Selected ML Algorithms:", ", ".join(selected_algorithms))
 
     with st.form(key='project_form'):
         st.subheader("Enter Project Theme")
@@ -78,12 +78,12 @@ def main():
 
     # Handle form submission
     if submit_button:
-        if (st.session_state.selected_libraries or st.session_state.selected_algorithms) and project_theme:
+        if (selected_libraries or selected_algorithms) and project_theme:
             st.success("Generating your project...")
             # Here you would call your project generation function
             st.write(f"Generating a project about '{project_theme}'")
-            st.write(f"Using libraries: {', '.join(st.session_state.selected_libraries)}")
-            st.write(f"Implementing algorithms: {', '.join(st.session_state.selected_algorithms)}")
+            st.write(f"Using libraries: {', '.join(selected_libraries)}")
+            st.write(f"Implementing algorithms: {', '.join(selected_algorithms)}")
         else:
             st.error("Please select at least one library or algorithm and enter a project theme.")
 
