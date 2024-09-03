@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Define topic groups
-libraries = ['NumPy', 'Pandas', 'PyTorch', 'TensorFlow', 'Keras', 'Matplotlib', 'Seaborn', 'Scikit-learn']
+libraries = ['NumPy', 'Pandas', 'TensorFlow', 'Keras', 'PyTorch', 'Matplotlib', 'Seaborn', 'Scikit-learn']
 ml_algorithms = ['Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forests', 'SVM', 'KNN']
 
 # Custom CSS for button styling
